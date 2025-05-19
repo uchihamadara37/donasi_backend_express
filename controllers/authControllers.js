@@ -124,13 +124,16 @@ export const login = async (req, res) => {
 
 // refreshToken untuk mendapat accessToken baru jika accessToken lama expired
 export const refreshToken = async (req, res) => {
-  const { accessToken, refreshToken } = req.body;
+  const { refreshToken } = req.body;
 
-  if (!refreshToken || !accessToken) return res.status(400).json({ error: 'Refresh and access token required' });
+  if (!refreshToken) return res.status(400).json({ error: 'Refresh token required' });
 
   try {
     // 1️⃣ Cek apakah token ada di database
-    const storedToken = await prisma.refreshToken.findUnique({ where: { token: refreshToken } });
+    const storedToken = await prisma.refreshToken.findUnique({
+      where: { token: refreshToken }
+    });
+
     if (!storedToken) return res.status(401).json({ error: 'Invalid refresh token' });
 
     // 2️⃣ Cek expired atau belum
@@ -142,32 +145,21 @@ export const refreshToken = async (req, res) => {
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {
       if (err) return res.status(401).json({ error: 'Invalid refresh token' });
 
-      jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err2, payload2) => {
-        if (err) {
-          // bikin accToken baru
-          // 4️⃣ Generate access token baru
-          const newAccessToken = jwt.sign(
-            { 
-              id: payload.id,
-              name: payload.name,
-              email: payload.email,
-            },
-            process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '15m' }
-          );
-          res.status(200).json({ 
-            accessToken: newAccessToken,
-            message: "mendapatkan token acc baru"
-          });
-        }else{
-          // pakai token yang sudah ada
-          res.status(200).json({ 
-            accessToken: accessToken,
-            message: "acc token tidak baru"
-          });
-        }
-      })
+      // 4️⃣ Generate access token baru
+      const newAccessToken = jwt.sign(
+        {
+          id: payload.id,
+          name: payload.name,
+          email: payload.email
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: '15m' }
+      );
 
+      res.status(200).json({
+        accessToken: newAccessToken,
+        message: "Token berhasil di-refresh"
+      });
     });
 
   } catch (error) {
