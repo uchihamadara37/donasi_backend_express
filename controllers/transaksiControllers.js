@@ -86,3 +86,46 @@ export const donasi = async (req, res) => {
     res.status(500).json({message: "Terjadi kesalahan saat donasi!"});
   }
 };
+
+export const getAllTransaksi = async (req, res) => {
+  try {
+    const transaksi = await prisma.transaksi.findMany({
+      select: {
+        id: true,
+        pengirim: { select: { id: true, name: true } },
+        penerima: { select: { id: true, name: true } },
+        jumlahDonasi: true,
+        pesanDonasi: true,
+        waktu: true
+      }
+    });
+    res.status(200).json(transaksi);
+  } catch (error) {
+    res.status(500).json({message: "Terjadi kesalahan server!"});
+  }
+};
+
+export const getTransaksibyId = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const transaksi = await prisma.transaksi.findUnique({
+      where: { id: parseInt(id) },
+      select: {
+        id: true,
+        pengirim: { select: { id: true, name: true } },
+        penerima: { select: { id: true, name: true } },
+        jumlahDonasi: true,
+        pesanDonasi: true,
+        waktu: true
+      }
+    });
+
+    if (!transaksi) {
+      return res.status(404).json({ message: "Transaksi tidak ditemukan" });
+    }
+
+    res.status(200).json(transaksi);
+  } catch (error) {
+    res.status(500).json({message: "Terjadi kesalahan server!"});
+  }
+};
