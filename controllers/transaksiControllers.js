@@ -101,6 +101,7 @@ export const getAllTransaksi = async (req, res) => {
     });
     res.status(200).json(transaksi);
   } catch (error) {
+    console.error(error);
     res.status(500).json({message: "Terjadi kesalahan server!"});
   }
 };
@@ -126,6 +127,7 @@ export const getTransaksibyId = async (req, res) => {
 
     res.status(200).json(transaksi);
   } catch (error) {
+    console.error(error);
     res.status(500).json({message: "Terjadi kesalahan server!"});
   }
 };
