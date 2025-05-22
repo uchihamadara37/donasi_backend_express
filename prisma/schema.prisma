@@ -13,14 +13,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// model user
 model User {
   id             Int             @id @default(autoincrement())
   name           String
   email          String          @unique
   password       String
+  saldo          Int             @default(0) // ← tambahkan ini
   refreshTokens  RefreshToken[]
+  transaksiDikirim  Transaksi[]  @relation("Pengirim")
+  transaksiDiterima Transaksi[]  @relation("Penerima")
+  histories        History[]
 }
 
+//model refresh token
 model RefreshToken {
   id         Int      @id @default(autoincrement())
   token      String   @unique
@@ -30,3 +36,41 @@ model RefreshToken {
   expiredAt  DateTime
   revoked    Boolean  @default(false)
 }
+
+//model transaksi
+model Transaksi {
+  id              Int      @id @default(autoincrement()) // id_transaksi
+  pengirim        User     @relation("Pengirim", fields: [pengirimId], references: [id])
+  pengirimId      Int
+  penerima        User     @relation("Penerima", fields: [penerimaId], references: [id])
+  penerimaId      Int
+  jumlahDonasi    Int
+  pesanDonasi     String?
+  waktu           DateTime @default(now())
+  histores        History[] 
+}
+
+//model history
+model History {
+  id             Int         @id @default(autoincrement()) // id_history
+  user           User        @relation(fields: [userId], references: [id])
+  userId         Int
+  jumlah         Int
+  jenis          JenisTransaksi      // "pemasukan" atau "pengeluaran"
+  sumber         SumberTransaksi      // "topup", "penarikan", "donasi"
+  transaksi      Transaksi?  @relation(fields: [transaksiId], references: [id])
+  transaksiId    Int?
+  waktu          DateTime    @default(now())
+}
+
+enum JenisTransaksi {
+  PEMASUKAN
+  PENGELUARAN
+}
+
+enum SumberTransaksi {
+  TOPUP
+  PENARIKAN
+  DONASI
+}
+
