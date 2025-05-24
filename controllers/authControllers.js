@@ -1,12 +1,17 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
+import { uploadFileToGCS } from '../utils/gcs.js';
+
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 // Auth Register
 export const register = async (req, res) => {
   const { name, email, password } = req.body;
+  const avatarFile = req.file; // Multer akan menambahkan file yang diunggah ke req.file
+
+
 
   if (!name || !email || !password) {
     return res.status(400).json({ error: 'There is something necessary field empty' });
@@ -18,12 +23,30 @@ export const register = async (req, res) => {
     return res.status(400).json({ error: 'Email already registered' });
   }
 
+  let avatarUrl = null; // Inisialisasi URL avatar
+  if (avatarFile) {
+    try {
+      // Unggah avatar ke GCS jika file ada
+      avatarUrl = await uploadFileToGCS(avatarFile.buffer, avatarFile.originalname, avatarFile.mimetype);
+      console.log('Avatar uploaded to GCS:', avatarUrl);
+    } catch (uploadError) {
+      console.error('Failed to upload avatar to GCS:', uploadError);
+      // Jika upload avatar gagal, kembalikan error ke klien
+      return res.status(500).json({ error: 'Failed to upload avatar image' });
+    }
+  }
+
   // 2️⃣ Hash password
   const hashedPassword = await bcrypt.hash(password, 10); // 10 = salt rounds
 
   // 3️⃣ Create new user with hashed password
   const newUser = await prisma.user.create({
-    data: { name, email, password: hashedPassword }
+    data: { 
+      name, 
+      email, 
+      password: hashedPassword, 
+      avatar: avatarUrl 
+    }
   });
 
   // 4️⃣ Generate access token
@@ -31,7 +54,8 @@ export const register = async (req, res) => {
     {
       id: newUser.id,
       email: newUser.email,
-      name: newUser.name
+      name: newUser.name,
+      avatarUrl: newUser.avatarUrl
     },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: '15m' } // atau sesukamu
@@ -42,7 +66,8 @@ export const register = async (req, res) => {
     {
       id: newUser.id,
       email: newUser.email,
-      name: newUser.name
+      name: newUser.name,
+      avatarUrl: newUser.avatarUrl
     },
     process.env.REFRESH_TOKEN_SECRET,
     { expiresIn: '7d' }
