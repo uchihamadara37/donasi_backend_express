@@ -4,10 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dokumentasi API Donasi</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <h1>Dokumentasi API Donasi</h1>
+    <p>
+      <strong>🔐 Catatan:</strong> Semua endpoint yang membutuhkan autentikasi harus disertai header
+      <strong><code>Authorization: Bearer &lt;access_token&gt;</code></strong>;
+      Kecuali untuk endpoint Auth
+    </p>
 
     <!-- USERS -->
     <h2>📁 Users</h2>
@@ -27,7 +32,25 @@
           <td>/api/users</td>
           <td>Ambil semua data user</td>
           <td>-</td>
-          <td><pre>{ "status": "Success", "data": [...] }</pre></td>
+          <td><pre>
+[
+    {
+        "id": 1,
+        "name": "Panji Arif JR",
+        "email": "panji@gmail.com"
+    },
+    {
+        "id": 3,
+        "name": "Jhon Doe",
+        "email": "coba@egmail.com"
+    },
+    {
+        "id": 4,
+        "name": "Andrea Alfian",
+        "email": "andre@gmail.com"
+    }
+]
+          </pre></td>
         </tr>
         <tr>
           <td>GET</td>
@@ -36,40 +59,35 @@
           <td>-</td>
           <td>
             <pre>
-{ "status": "Success", "data": { "id": 1, "name": "John" } }
-            </pre>
-          </td>
-        </tr>
-        <tr>
-          <td>POST</td>
-          <td>/api/users</td>
-          <td>Tambah user baru</td>
-          <td>
-            <pre>
 {
-  "name": "Jane",
-  "email": "jane@mail.com",
-  "gender": "Female"
+    "id": 4,
+    "name": "Andrea Alfian",
+    "email": "andre@gmail.com"
 }
             </pre>
           </td>
-          <td>
-            <pre>{ "status": "Success", "message": "Users Created" }</pre>
-          </td>
         </tr>
-        <tr>
           <td>PUT</td>
           <td>/api/users/:id</td>
           <td>Update data user</td>
           <td>
             <pre>
 {
-  "name": "Jane Doe"
+  "name": "Andrea Alfian Sah Putra",
 }
             </pre>
           </td>
           <td>
-            <pre>{ "status": "Success", "message": "Users Updated" }</pre>
+            <pre>
+{
+    "message": "User updated successfully",
+    "user": {
+        "id": 4,
+        "name": "Andrea Alfian Sah Putra",
+        "email": "andre@gmail.com"
+    }
+}
+            </pre>
           </td>
         </tr>
         <tr>
@@ -78,7 +96,11 @@
           <td>Hapus user</td>
           <td>-</td>
           <td>
-            <pre>{ "status": "Success", "message": "Users Deleted" }</pre>
+            <pre>
+{
+    "message": "User with id 4 deleted successfully"
+}
+            </pre>
           </td>
         </tr>
       </tbody>
@@ -102,31 +124,89 @@
           <td>/api/transaksi</td>
           <td>Ambil semua data transaksi</td>
           <td>-</td>
-          <td><pre>{ "status": "Success", "data": [...] }</pre></td>
+          <td><pre>
+[
+  {
+      "id": 1,
+      "pengirim": {
+          "id": 3,
+          "name": "Jhon Doe"
+      },
+      "penerima": {
+          "id": 1,
+          "name": "Panji Arif JR"
+      },
+      "jumlahDonasi": 5000,
+      "pesanDonasi": "Tetap semangat!",
+      "waktu": "2025-05-21T02:48:31.875Z"
+  },
+  {
+      "id": 2,
+      "pengirim": {
+          "id": 1,
+          "name": "Panji Arif JR"
+      },
+      "penerima": {
+          "id": 3,
+          "name": "Jhon Doe"
+      },
+      "jumlahDonasi": 5000,
+      "pesanDonasi": "Saya kembalikan!",
+      "waktu": "2025-05-21T03:05:09.245Z"
+  }
+]
+          </pre></td>
         </tr>
         <tr>
           <td>GET</td>
           <td>/api/transaksi/:id</td>
           <td>Ambil transaksi berdasarkan ID</td>
           <td>-</td>
-          <td><pre>{ "id": 1, "pengirim": {...}, "penerima": {...} }</pre></td>
+          <td><pre>
+{
+    "id": 1,
+    "pengirim": {
+        "id": 3,
+        "name": "Jhon Doe"
+    },
+    "penerima": {
+        "id": 1,
+        "name": "Panji Arif JR"
+    },
+    "jumlahDonasi": 5000,
+    "pesanDonasi": "Tetap semangat!",
+    "waktu": "2025-05-21T02:48:31.875Z"
+}
+          </pre></td>
         </tr>
         <tr>
           <td>POST</td>
-          <td>/api/transaksi</td>
-          <td>Buat transaksi baru</td>
+          <td>/api/donasi</td>
+          <td>Buat transaksi baru (donasi)</td>
           <td>
             <pre>
 {
-  "pengirimId": 1,
-  "penerimaId": 2,
-  "jumlahDonasi": 50000,
-  "pesanDonasi": "Semangat ya!"
-}
+  "pengirimId": 3,
+  "penerimaId": 1,
+  "jumlahDonasi": 15000,
+  "pesanDonasi": "Semangat!"
+}              
             </pre>
           </td>
           <td>
-            <pre>{ "status": "Success", "message": "Transaksi Created" }</pre>
+            <pre>
+{
+    "message": "Donasi berhasil!",
+    "transaksi": {
+        "id": 3,
+        "pengirimId": 3,
+        "penerimaId": 1,
+        "jumlahDonasi": 15000,
+        "pesanDonasi": "Semangat!",
+        "waktu": "2025-05-24T06:06:51.947Z"
+    }
+}
+            </pre>
           </td>
         </tr>
       </tbody>
@@ -150,106 +230,128 @@
           <td>/api/history/:userId</td>
           <td>Ambil riwayat donasi user</td>
           <td>-</td>
-          <td><pre>{ "status": "Success", "data": [...] }</pre></td>
+          <td><pre>
+[
+  {
+      "id": 3,
+      "jumlah": 5000,
+      "jenis": "PEMASUKAN",
+      "sumber": "DONASI",
+      "transaksiId": 2,
+      "waktu": "2025-05-21T03:05:09.310Z"
+  },
+  {
+      "id": 1,
+      "jumlah": 5000,
+      "jenis": "PENGELUARAN",
+      "sumber": "DONASI",
+      "transaksiId": 1,
+      "waktu": "2025-05-21T02:48:31.949Z"
+  }
+]
+          </pre></td>
         </tr>
-        
+        <tr>
+          <td>GET</td>
+          <td>/api/history/detail/:id</td>
+          <td>Ambil detail riwayat satu donasi user</td>
+          <td>-</td>
+          <td><pre>
+{
+    "id": 3,
+    "jumlah": 5000,
+    "jenis": "PEMASUKAN",
+    "sumber": "DONASI",
+    "transaksiId": 2,
+    "waktu": "2025-05-21T03:05:09.310Z"
+}
+          </pre></td>
+        </tr>
       </tbody>
     </table>
-    <!-- AUTH -->
-<h2>🔐 Auth</h2>
-<table>
-  <thead>
-    <tr>
-      <th>Metode</th>
-      <th>Endpoint</th>
-      <th>Deskripsi</th>
-      <th>Request Body</th>
-      <th>Contoh Response</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>POST</td>
-      <td>/api/register</td>
-      <td>Daftarkan akun baru</td>
-      <td>
-        <pre>
-{
-  "name": "rafli",
-  "email": "rafli@gmail.com",
-  "password": "rahasia123"
-}
-        </pre>
-      </td>
-      <td>
-        <pre>
-{ "status": "Success", "message": "User Registered" }
-        </pre>
-      </td>
-    </tr>
-    <tr>
-      <td>POST</td>
-      <td>/api/login</td>
-      <td>Login dan dapatkan access & refresh token</td>
-      <td>
-        <pre>
-{
-  "email": "rafli@gmail.com",
-  "password": "rahasia123"
-}
-        </pre>
-      </td>
-      <td>
-        <pre>
-{
-  "accessToken": "xxx.yyy.zzz",
-  "refreshToken": "abc.def.ghi",
-  "user": {
-    "id": 1,
-    "name": "rafli"
-  }
-}
-        </pre>
-      </td>
-    </tr>
-    <tr>
-      <td>DELETE</td>
-      <td>/api/logout</td>
-      <td>Logout dan hapus refresh token</td>
-      <td>
-        <pre>
-{
-  "refreshToken": "abc.def.ghi"
-}
-        </pre>
-      </td>
-      <td>
-        <pre>
-{ "status": "Success", "message": "Logged out" }
-        </pre>
-      </td>
-    </tr>
-    <tr>
-      <td>POST</td>
-      <td>/api/token</td>
-      <td>Perbarui access token dengan refresh token</td>
-      <td>
-        <pre>
-{
-  "refreshToken": "abc.def.ghi"
-}
-        </pre>
-      </td>
-      <td>
-        <pre>
-{
-  "accessToken": "baru.xxx.yyy"
-}
-        </pre>
-      </td>
-    </tr>
-  </tbody>
-</table>
 
+    <!-- AUTH -->
+    <h2>🔐 Auth</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Metode</th>
+          <th>Endpoint</th>
+          <th>Deskripsi</th>
+          <th>Request Body</th>
+          <th>Contoh Response</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>POST</td>
+          <td>/api/users</td>
+          <td>Daftarkan akun baru</td>
+          <td>
+            <pre>
+{
+  "name": "Andrea Alfian",
+  "email": "andre@gmail.com",
+  "password": "rahasia123"
+}
+            </pre>
+          </td>
+          <td>
+            <pre>
+{ "message": "User registered successfully" }
+            </pre>
+          </td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/login</td>
+          <td>Login dan dapatkan access & refresh token</td>
+          <td>
+            <pre>
+{
+  "email": "panji@gmail.com",
+  "password": "password123"
+}
+            </pre>
+          </td>
+          <td>
+            <pre>
+{
+  "message": "Login successful",
+  "user": {
+      "id": 1,
+      "name": "Panji Arif JR",
+      "email": "panji@gmail.com",
+      "saldo": 0
+  },
+  "accessToken": "access.token.xyz",
+  "refreshToken": "refresh.token.xyz"
+}
+            </pre>
+          </td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/refreshToken</td>
+          <td>Perbarui access token dengan refresh token</td>
+          <td>
+            <pre>
+{
+  "accessToken": "access.token.xyz",
+  "refreshToken": "refresh.token.xyz"
+}
+            </pre>
+          </td>
+          <td>
+            <pre>
+{
+  "message": "Token berhasil di-refresh",
+  "accessToken": "refresh.token.baru"
+}
+            </pre>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </body>
 </html>
