@@ -1,11 +1,255 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document API Donasi</title>
-</head>
-<body>
-    <h1>Ini Dokumentasi</h1>
-</body>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dokumentasi API Donasi</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <h1>Dokumentasi API Donasi</h1>
+
+    <!-- USERS -->
+    <h2>📁 Users</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Metode</th>
+          <th>Endpoint</th>
+          <th>Deskripsi</th>
+          <th>Request Body</th>
+          <th>Contoh Response</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>GET</td>
+          <td>/api/users</td>
+          <td>Ambil semua data user</td>
+          <td>-</td>
+          <td><pre>{ "status": "Success", "data": [...] }</pre></td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/api/users/:id</td>
+          <td>Ambil user berdasarkan ID</td>
+          <td>-</td>
+          <td>
+            <pre>
+{ "status": "Success", "data": { "id": 1, "name": "John" } }
+            </pre>
+          </td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/users</td>
+          <td>Tambah user baru</td>
+          <td>
+            <pre>
+{
+  "name": "Jane",
+  "email": "jane@mail.com",
+  "gender": "Female"
+}
+            </pre>
+          </td>
+          <td>
+            <pre>{ "status": "Success", "message": "Users Created" }</pre>
+          </td>
+        </tr>
+        <tr>
+          <td>PUT</td>
+          <td>/api/users/:id</td>
+          <td>Update data user</td>
+          <td>
+            <pre>
+{
+  "name": "Jane Doe"
+}
+            </pre>
+          </td>
+          <td>
+            <pre>{ "status": "Success", "message": "Users Updated" }</pre>
+          </td>
+        </tr>
+        <tr>
+          <td>DELETE</td>
+          <td>/api/users/:id</td>
+          <td>Hapus user</td>
+          <td>-</td>
+          <td>
+            <pre>{ "status": "Success", "message": "Users Deleted" }</pre>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- TRANSAKSI -->
+    <h2>💸 Transaksi</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Metode</th>
+          <th>Endpoint</th>
+          <th>Deskripsi</th>
+          <th>Request Body</th>
+          <th>Contoh Response</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>GET</td>
+          <td>/api/transaksi</td>
+          <td>Ambil semua data transaksi</td>
+          <td>-</td>
+          <td><pre>{ "status": "Success", "data": [...] }</pre></td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/api/transaksi/:id</td>
+          <td>Ambil transaksi berdasarkan ID</td>
+          <td>-</td>
+          <td><pre>{ "id": 1, "pengirim": {...}, "penerima": {...} }</pre></td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/transaksi</td>
+          <td>Buat transaksi baru</td>
+          <td>
+            <pre>
+{
+  "pengirimId": 1,
+  "penerimaId": 2,
+  "jumlahDonasi": 50000,
+  "pesanDonasi": "Semangat ya!"
+}
+            </pre>
+          </td>
+          <td>
+            <pre>{ "status": "Success", "message": "Transaksi Created" }</pre>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- HISTORY -->
+    <h2>🕓 History</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Metode</th>
+          <th>Endpoint</th>
+          <th>Deskripsi</th>
+          <th>Request Body</th>
+          <th>Contoh Response</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>GET</td>
+          <td>/api/history/:userId</td>
+          <td>Ambil riwayat donasi user</td>
+          <td>-</td>
+          <td><pre>{ "status": "Success", "data": [...] }</pre></td>
+        </tr>
+        
+      </tbody>
+    </table>
+    <!-- AUTH -->
+<h2>🔐 Auth</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Metode</th>
+      <th>Endpoint</th>
+      <th>Deskripsi</th>
+      <th>Request Body</th>
+      <th>Contoh Response</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>POST</td>
+      <td>/api/register</td>
+      <td>Daftarkan akun baru</td>
+      <td>
+        <pre>
+{
+  "name": "rafli",
+  "email": "rafli@gmail.com",
+  "password": "rahasia123"
+}
+        </pre>
+      </td>
+      <td>
+        <pre>
+{ "status": "Success", "message": "User Registered" }
+        </pre>
+      </td>
+    </tr>
+    <tr>
+      <td>POST</td>
+      <td>/api/login</td>
+      <td>Login dan dapatkan access & refresh token</td>
+      <td>
+        <pre>
+{
+  "email": "rafli@gmail.com",
+  "password": "rahasia123"
+}
+        </pre>
+      </td>
+      <td>
+        <pre>
+{
+  "accessToken": "xxx.yyy.zzz",
+  "refreshToken": "abc.def.ghi",
+  "user": {
+    "id": 1,
+    "name": "rafli"
+  }
+}
+        </pre>
+      </td>
+    </tr>
+    <tr>
+      <td>DELETE</td>
+      <td>/api/logout</td>
+      <td>Logout dan hapus refresh token</td>
+      <td>
+        <pre>
+{
+  "refreshToken": "abc.def.ghi"
+}
+        </pre>
+      </td>
+      <td>
+        <pre>
+{ "status": "Success", "message": "Logged out" }
+        </pre>
+      </td>
+    </tr>
+    <tr>
+      <td>POST</td>
+      <td>/api/token</td>
+      <td>Perbarui access token dengan refresh token</td>
+      <td>
+        <pre>
+{
+  "refreshToken": "abc.def.ghi"
+}
+        </pre>
+      </td>
+      <td>
+        <pre>
+{
+  "accessToken": "baru.xxx.yyy"
+}
+        </pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  </body>
 </html>
