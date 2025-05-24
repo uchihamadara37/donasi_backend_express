@@ -25,10 +25,23 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Setup __dirname (karena kamu pakai ES Modules)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve file dokumentasi dari folder /docs
+app.use('/docs', express.static(path.join(__dirname, 'docs')));
+
 app.use("/api", userRoutes)
 app.use("/api", authRoutes)
 app.use("/api", transaksiRoutes)
 app.use("/api", historyRoutes)
+app.get("/api", (req, res) => {
+  res.redirect("/docs");
+});
 
 const PORT = process.env.PORT || 3000;
 
