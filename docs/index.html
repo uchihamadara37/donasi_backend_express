@@ -209,6 +209,49 @@
             </pre>
           </td>
         </tr>
+        <tr>
+          <td>PUT</td>
+          <td>/api/transaksi/:id</td>
+          <td>Mengubah transaksi</td>
+          <td>
+            <pre>
+{
+  "pengirimId": 3,
+  "penerimaId": 1,
+  "jumlahDonasi": 15000,
+  "pesanDonasi": "Semangat diubah!"
+}              
+            </pre>
+          </td>
+          <td>
+            <pre>
+{
+    "message": "Transaction message updated successfully",
+    "transaksi": {
+        "id": 3,
+        "pengirimId": 3,
+        "penerimaId": 1,
+        "jumlahDonasi": 15000,
+        "pesanDonasi": "Semangat diubah!",
+        "waktu": "2025-05-24T06:06:51.947Z"
+    }
+}
+            </pre>
+          </td>
+        </tr>
+        <tr>
+          <td>DELETE</td>
+          <td>/api/transaksi/:id</td>
+          <td>Menghapus transaksi</td>
+          <td>-</td>
+          <td>
+            <pre>
+{
+    "message": "Transaction with ID 3 deleted successfully",
+}
+            </pre>
+          </td>
+        </tr>
       </tbody>
     </table>
 
