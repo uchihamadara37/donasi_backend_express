@@ -114,3 +114,54 @@ export const getHistoryById = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// // Update history by ID
+// export const updateHistory = async (req, res) => {
+//     const { id } = req.params;
+//     const { jumlah, jenis, sumber, transaksiId } = req.body;
+
+//     try {
+//         const updatedHistory = await prisma.history.update({
+//             where: { id: parseInt(id) },
+//             data: {
+//                 jumlah,
+//                 jenis,
+//                 sumber,
+//                 transaksiId: transaksiId || null,
+//             },
+//             select: {
+//                 id: true,
+//                 jumlah: true,
+//                 jenis: true,
+//                 sumber: true,
+//                 transaksiId: true,
+//                 waktu: true,
+//             },
+//         });
+
+//         res.status(200).json({ message: "History updated successfully", history: updatedHistory});
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: error.message });
+//     }
+// };
+
+// // Delete history by ID
+// export const deleteHistory = async (req, res) => {
+//   const { id } = req.params;
+
+//   try {
+//       const history = await prisma.history.delete({
+//           where: { id: parseInt(id) },
+//       });
+
+//       if (!history) {
+//           return res.status(404).json({ message: "History tidak ditemukan" });
+//       }
+
+//       res.status(200).json({ message: "History berhasil dihapus" });
+//   } catch (error) {
+//       console.error(error);
+//       res.status(500).json({ message: error.message });
+//   }
+// }
