@@ -9,9 +9,6 @@ import transaksiRoutes from './routes/transaksiRoutes.js';
 import historyRoutes from './routes/historyRoutes.js';
 import cookieParser from 'cookie-parser';
 
-import https from 'https';
-import fs from 'fs';
-
 const app = express();
 const prisma = new PrismaClient();
 
@@ -22,15 +19,14 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    if (whitelist.indexOf(origin) !== -1 || !origin) { // !origin mengizinkan request tanpa origin (seperti dari Postman atau curl)
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  optionsSuccessStatus: 200,
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 };
@@ -61,10 +57,5 @@ app.get("/api", (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 // app.listen(PORT, () => console.log('Server running on port 3000'));
-
-const options = {
-  key: fs.readFileSync("./localhost-key.pem"),
-  cert: fs.readFileSync('./localhost.pem')
-};
 
 https.createServer(options, app).listen(PORT, () => console.log('Server running on port 3000'));
