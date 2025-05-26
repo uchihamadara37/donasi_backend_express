@@ -159,7 +159,7 @@ export const getHistoryById = async (req, res) => {
 //           return res.status(404).json({ message: "History tidak ditemukan" });
 //       }
 
-//       res.status(200).json({ message: "History berhasil dihapus" });
+//       res.status(200).json({ message: `History with ${id} delete successfully` });
 //   } catch (error) {
 //       console.error(error);
 //       res.status(500).json({ message: error.message });

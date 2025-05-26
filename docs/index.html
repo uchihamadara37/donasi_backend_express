@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1>Dokumentasi API Donasi</h1>
+    <h1>Dokumentasi API Donate App</h1>
     <p>
       <strong>🔐 Catatan:</strong> Semua endpoint yang membutuhkan autentikasi harus disertai header
       <strong><code>Authorization: Bearer &lt;access_token&gt;</code></strong>;
@@ -212,7 +212,7 @@
         <tr>
           <td>PUT</td>
           <td>/api/transaksi/:id</td>
-          <td>Mengubah transaksi</td>
+          <td>Update transaksi</td>
           <td>
             <pre>
 {
@@ -242,7 +242,7 @@
         <tr>
           <td>DELETE</td>
           <td>/api/transaksi/:id</td>
-          <td>Menghapus transaksi</td>
+          <td>Hapus transaksi</td>
           <td>-</td>
           <td>
             <pre>
@@ -307,6 +307,76 @@
     "sumber": "DONASI",
     "transaksiId": 2,
     "waktu": "2025-05-21T03:05:09.310Z"
+}
+          </pre></td>
+        </tr>
+        <tr>
+          <td>PUT</td>
+          <td>/api/history/:id</td>
+          <td>Update History</td>
+          <td>
+            <pre>
+{
+    "jumlah": 7000,
+    "jenis": "PEMASUKAN",
+    "sumber": "DONASI",
+    "transaksiId": 2,
+}
+              </pre>
+          </td>
+          <td><pre>
+{
+    "message": "History updated successfully",
+    "history": {
+        "id": 3,
+        "jumlah": 7000,
+        "jenis": "PEMASUKAN",
+        "sumber": "DONASI",
+        "transaksiId": 2,
+        "waktu": "2025-05-21T03:05:09.310Z"
+    }
+}
+          </pre></td>
+        </tr>
+        <tr>
+          <td>DELETE</td>
+          <td>/api/history/:id</td>
+          <td>Hapus History</td>
+          <td>-</td>
+          <td><pre>
+{
+    "message": "History with ID 3 delete successfully",
+}
+          </pre></td>
+        </tr>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/history</td>
+          <td>Add History</td>
+          <td>
+            <pre>
+{
+    "UserId": 1,
+    "jumlah": 10000,
+    "jenis": "PEMASUKAN",
+    "sumber": "DONASI",
+    "transaksiId": 3,
+}
+            </pre>
+          </td>
+          <td><pre>
+{
+    "message": "History added successfully",
+    "history": {
+        "id": 4,
+        "UserId": 1,
+        "jumlah": 10000,
+        "jenis": "PEMASUKAN",
+        "sumber": "DONASI",
+        "transaksiId": 3,
+        "waktu": "2025-05-24T06:06:51.947Z"
+    }
 }
           </pre></td>
         </tr>
