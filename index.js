@@ -15,11 +15,21 @@ import fs from 'fs';
 const app = express();
 const prisma = new PrismaClient();
 
+const allowedOrigins = [
+  'http://localhost:5000',
+  'https://yourdomain.com'
+];
+
 const corsOptions = {
-  origin: [
-    'http://localhost:5000', 
-    'https://yourdomain.com'
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
