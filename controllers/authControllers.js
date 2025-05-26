@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { uploadFileToGCS } from '../utils/gcs.js';
 
 import { PrismaClient } from '@prisma/client';
+import path from 'path';
 const prisma = new PrismaClient();
 
 // Auth Register
@@ -85,7 +86,8 @@ export const register = async (req, res) => {
     httpOnly: true,
     secure: true, // true di produksi (HTTPS)
     sameSite: 'None', // Atau 'Lax' tergantung kebutuhan
-    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 hari dalam ms
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 hari dalam ms
+    path: '/' 
   });
 
   res.status(201).json({
@@ -154,11 +156,12 @@ export const login = async (req, res) => {
       }
     });
 
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie('refreshToken', 'jangkrik', {
       httpOnly: true,
-      secure: true, // true di produksi (HTTPS)
-      sameSite: 'None', // Atau 'Lax' tergantung kebutuhan
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 hari dalam ms
+      secure: true, 
+      sameSite: 'None',
+      maxAge: 7 * 24 * 60 * 60 * 1000, 
+      path: '/' 
     });
 
     // 6️⃣ Return token ke client
