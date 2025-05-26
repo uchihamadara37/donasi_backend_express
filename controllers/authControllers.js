@@ -156,7 +156,7 @@ export const login = async (req, res) => {
       }
     });
 
-    res.cookie('refreshToken', 'jangkrik', {
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true, 
       sameSite: 'none',
