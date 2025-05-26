@@ -19,7 +19,7 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1 || !origin) { // !origin mengizinkan request tanpa origin (seperti dari Postman atau curl)
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) { // !origin mengizinkan request tanpa origin (seperti dari Postman atau curl)
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -56,6 +56,6 @@ app.get("/api", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-// app.listen(PORT, () => console.log('Server running on port 3000'));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-https.createServer(options, app).listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// https.createServer(options, app).listen(PORT, () => console.log(`Server running on port ${PORT}`));
