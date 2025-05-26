@@ -82,9 +82,9 @@ export const register = async (req, res) => {
   });
 
   res.cookie('refreshToken', refreshToken, {
-    httpOnly: false,
-    secure: process.env.NODE_ENV === 'production', // true di produksi (HTTPS)
-    sameSite: 'Lax', // Atau 'Lax' tergantung kebutuhan
+    httpOnly: true,
+    secure: true, // true di produksi (HTTPS)
+    sameSite: 'None', // Atau 'Lax' tergantung kebutuhan
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 hari dalam ms
   });
 
@@ -155,9 +155,9 @@ export const login = async (req, res) => {
     });
 
     res.cookie('refreshToken', refreshToken, {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === 'production', // true di produksi (HTTPS)
-      sameSite: 'Lax', // Atau 'Lax' tergantung kebutuhan
+      httpOnly: true,
+      secure: true, // true di produksi (HTTPS)
+      sameSite: 'None', // Atau 'Lax' tergantung kebutuhan
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 hari dalam ms
     });
 
@@ -208,7 +208,7 @@ export const logout = async (req, res) => {
     // Tetap hapus cookie meskipun ada error DB untuk memastikan logout di client
     res.clearCookie('refreshToken', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true,
       sameSite: 'None'
     });
     res.status(500).json({ message: 'Error during logout' });
