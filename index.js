@@ -14,7 +14,8 @@ const prisma = new PrismaClient();
 
 const allowedOrigins = [
   'http://localhost:5000',
-  'https://yourdomain.com'
+  'https://yourdomain.com',
+  'https://donasi-app-dot-c-01-450604.uc.r.appspot.com'
 ];
 
 const corsOptions = {
