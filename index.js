@@ -26,7 +26,7 @@ const corsOptions = {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   optionsSuccessStatus: 200,
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
@@ -34,7 +34,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(cookieParser());
-
 app.use(express.json());
 
 import path from 'path';
@@ -58,5 +57,3 @@ app.get("/api", (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-// https.createServer(options, app).listen(PORT, () => console.log(`Server running on port ${PORT}`));
