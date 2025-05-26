@@ -249,7 +249,7 @@ export const refreshToken = async (req, res) => {
     // 3. Ambil data user dari database (lebih aman dan up-to-date)
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },
-      select: { id: true, name: true, email: true, avatar: true } // Pilih field yang ingin Anda kirim ke frontend
+      select: { id: true, name: true, email: true, avatar: true, saldo: true } // Pilih field yang ingin Anda kirim ke frontend
     });
 
     if (!user) {
