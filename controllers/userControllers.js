@@ -8,6 +8,8 @@ export const getAllUser = async (req, res) => {
       id: true,
       name: true,
       email: true,
+      avatar: true,
+      saldo: true,
       // password tidak disertakan
     },
   });
@@ -37,8 +39,9 @@ export const getUserById = async (req, res) => {
 
 // Update User
 export const updateUser = async (req, res) => {
+  console.log('Update User Controller called');
   const { id } = req.params; // dapatkan id dari param URL
-  const { name, email, password } = req.body; // data yang mau diupdate
+  const { name, email, password, saldo } = req.body; // data yang mau diupdate
 
   try {
     // Jika password ada, hash dulu
@@ -55,17 +58,21 @@ export const updateUser = async (req, res) => {
         ...(name && { name }),
         ...(email && { email }),
         ...(password && { password: hashedPassword }),
+        ...(saldo !== undefined && { saldo }), // saldo bisa 0, jadi jangan gunakan falsy check
       },
       select: {
         id: true,
         name: true,
         email: true,
+        avatar: true,
+        saldo: true,
         // jangan kirim password ke client
       },
     });
 
     res.json({ message: 'User updated successfully', user: updatedUser });
   } catch (error) {
+    throw error; // lempar error ke middleware error handling
     console.error(error);
     // Jika user dengan id tidak ada, Prisma akan error, tangani di sini:
     if (error.code === 'P2025') {

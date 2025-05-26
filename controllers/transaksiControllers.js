@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-export const donasi = async (req, res) => {
+export const addTransaksi = async (req, res) => {
   try {
     const { pengirimId, penerimaId, jumlahDonasi, pesanDonasi } = req.body;
 
@@ -78,9 +78,12 @@ export const donasi = async (req, res) => {
       });
 
       return transaksi;
+    }, {
+      maxWait: 10000,
+      timeout: 15000,
     });
 
-    res.status(201).json({message: "Donasi berhasil!", transaksi: result});
+    res.status(201).json({message: "Transaksi donasi berhasil! :backend", transaksi: result});
   } catch (error) {
     console.log(error);
     res.status(500).json({message: "Terjadi kesalahan saat donasi!"});
@@ -92,8 +95,8 @@ export const getAllTransaksi = async (req, res) => {
     const transaksi = await prisma.transaksi.findMany({
       select: {
         id: true,
-        pengirim: { select: { id: true, name: true } },
-        penerima: { select: { id: true, name: true } },
+        pengirim: { select: { id: true, name: true, email: true } },
+        penerima: { select: { id: true, name: true, email: true } },
         jumlahDonasi: true,
         pesanDonasi: true,
         waktu: true
@@ -113,8 +116,8 @@ export const getTransaksibyId = async (req, res) => {
       where: { id: parseInt(id) },
       select: {
         id: true,
-        pengirim: { select: { id: true, name: true } },
-        penerima: { select: { id: true, name: true } },
+        pengirim: { select: { id: true, name: true, email: true } },
+        penerima: { select: { id: true, name: true, email: true } },
         jumlahDonasi: true,
         pesanDonasi: true,
         waktu: true
@@ -129,5 +132,108 @@ export const getTransaksibyId = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({message: "Terjadi kesalahan server!"});
+  }
+};
+
+export const updateTransaksiById = async (req, res) => {
+  // Ambil ID transaksi dari parameter URL
+  // Misalnya, jika rute Anda adalah /transactions/:id
+  const transaksiId = parseInt(req.params.id); // Pastikan ini dikonversi ke integer
+  
+  // Ambil pesanDonasi baru dari body request
+  const { pesanDonasi } = req.body;
+
+  // --- 1. Validasi Input ---
+  if (isNaN(transaksiId)) {
+    return res.status(400).json({ error: 'Invalid transaction ID provided.' });
+  }
+
+  if (pesanDonasi === undefined) {
+    return res.status(400).json({ error: 'pesanDonasi field is required in the request body.' });
+  }
+
+  try {
+    const updatedTransaksi = await prisma.transaksi.update({
+      where: {
+        id: transaksiId, // Kriteria pencarian berdasarkan ID
+      },
+      data: {
+        pesanDonasi: pesanDonasi, // Hanya memperbarui field ini
+      },
+      select: {
+        id: true,
+        pengirim: { select: { id: true, name: true, email: true } },
+        penerima: { select: { id: true, name: true, email: true } },
+        jumlahDonasi: true,
+        pesanDonasi: true,
+        waktu: true,
+      },
+    });
+
+    // --- 3. Kirim Respon Sukses ---
+    res.status(200).json({
+      message: 'Transaction message updated successfully',
+      transaksi: updatedTransaksi,
+    });
+
+  } catch (error) {
+    // --- 4. Penanganan Error ---
+    console.error('Error updating transaction:', error);
+
+    // Penanganan error spesifik dari Prisma jika record tidak ditemukan
+    if (error.code === 'P2025') { // 'An operation failed because it depends on one or more records that were required but not found.'
+      return res.status(404).json({ error: `Transaction with ID ${transaksiId} not found.` });
+    }
+    
+    // Penanganan error umum lainnya
+    res.status(500).json({ error: 'Failed to update transaction due to server error.' });
+  }
+};
+
+export const deleteTransaksiById = async (req, res) => {
+  // Ambil ID transaksi dari parameter URL
+  // Misalnya, jika rute Anda adalah /transactions/:id
+  const transaksiId = parseInt(req.params.id); // Pastikan ini dikonversi ke integer
+
+  // --- 1. Validasi Input ---
+  if (isNaN(transaksiId)) {
+    return res.status(400).json({ error: 'Invalid transaction ID provided. ID must be a number.' });
+  }
+
+  try {
+    // --- 2. Hapus Transaksi dari Database ---
+    // Menggunakan prisma.transaksi.delete() untuk menghapus satu record
+    const deletedTransaksi = await prisma.transaksi.delete({
+      where: {
+        id: transaksiId, // Kriteria penghapusan berdasarkan ID
+      },
+      // Anda bisa memilih field mana yang ingin dikembalikan dalam response
+      select: {
+        id: true,
+        pengirimId: true,
+        penerimaId: true,
+        jumlahDonasi: true,
+        pesanDonasi: true,
+        waktu: true,
+      },
+    });
+
+    // --- 3. Kirim Respon Sukses ---
+    res.status(200).json({
+      message: `Transaction with ID ${transaksiId} deleted successfully`,
+      // transaksi: deletedTransaksi, // Mengembalikan objek yang dihapus
+    });
+
+  } catch (error) {
+    // --- 4. Penanganan Error ---
+    console.error('Error deleting transaction:', error);
+
+    // Penanganan error spesifik dari Prisma jika record tidak ditemukan
+    if (error.code === 'P2025') { // 'An operation failed because it depends on one or more records that were required but not found.'
+      return res.status(404).json({ error: `Transaction with ID ${transaksiId} not found.` });
+    }
+    
+    // Penanganan error umum lainnya
+    res.status(500).json({ error: 'Failed to delete transaction due to server error.' });
   }
 };

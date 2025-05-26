@@ -1,0 +1,26 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/donasi-backend', '.' ]
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'push', 'gcr.io/$PROJECT_ID/donasi-backend' ]
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'donasi-backend'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/donasi-backend'
+      - '--region'
+      - 'asia-southeast2'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'DATABASE_URL=${_DATABASE_URL},NODE_ENV=${_NODE_ENV},ACCESS_TOKEN_SECRET=${_ACCESS_TOKEN_SECRET},REFRESH_TOKEN_SECRET=${_REFRESH_TOKEN_SECRET},GCS_BUCKET_NAME=${_GCS_BUCKET_NAME},GCP_PROJECT_ID=${_GCP_PROJECT_ID},GCP_CLIENT_EMAIL=${_GCP_CLIENT_EMAIL},GCP_PRIVATE_KEY=${_GCP_PRIVATE_KEY}'
+images:
+  - 'gcr.io/$PROJECT_ID/donasi-backend'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

@@ -1,5 +1,5 @@
 import express from 'express';
-import { login, refreshToken, register } from '../controllers/authControllers.js';
+import { editUserNameAndAvatar, login, logout, refreshToken, register } from '../controllers/authControllers.js';
 import multer from 'multer';
 
 const router = express.Router();
@@ -20,6 +20,8 @@ const upload = multer({
 
 router.post('/login', login);
 router.post('/refreshToken', refreshToken);
-router.post('/auth', upload.single("avatar"), register);
+router.post('/register', upload.single("avatar"), register);
+router.put('/editProfile/:id', upload.single("avatar"), editUserNameAndAvatar); // Menggunakan register untuk update profile
+router.post("/logout", logout);
 
 export default router;
