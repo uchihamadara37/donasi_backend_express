@@ -7,5 +7,7 @@ const router = express.Router();
 router.post('/history', verifyToken, addHistory);
 router.get('/history/:id', verifyToken, getHistory);
 router.get('/history/detail/:id', verifyToken, getHistoryById);
+// router.put('/history/:id', verifyToken, updateHistory);
+// router.delete('/history/:id', verifyToken, deleteHistory); 
 
 export default router;
