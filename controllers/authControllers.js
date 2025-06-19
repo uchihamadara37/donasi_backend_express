@@ -97,7 +97,8 @@ export const register = async (req, res) => {
       name: newUser.name,
       email: newUser.email,
       avatar: newUser.avatar,
-      saldo: newUser.saldo
+      saldo: newUser.saldo,
+      pin: true
     },
     accessToken,
     refreshToken
@@ -126,9 +127,9 @@ export const login = async (req, res) => {
     // 3️⃣ Generate access token
     const accessToken = jwt.sign(
       {
-        id: user.id,
-        email: user.email,
-        name: user.name,
+        id    : user.id,
+        email : user.email,
+        name  : user.name,
         avatar: user.avatarUrl
       },
       process.env.ACCESS_TOKEN_SECRET,
@@ -148,7 +149,7 @@ export const login = async (req, res) => {
     );
 
     // 5️⃣ Simpan refresh token ke database
-    await prisma.refreshToken.create({
+    await prisma.refreshToken.create({   
       data: {
         token: refreshToken,
         userId: user.id,
@@ -156,10 +157,10 @@ export const login = async (req, res) => {
       }
     });
 
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie('refreshToken', refreshToken, {  // untuk memerintahkan browser menyimpan data token
       httpOnly: true,
       secure: true, 
-      sameSite: 'none',
+      sameSite: 'none',     
       maxAge: 7 * 24 * 60 * 60 * 1000, 
       path: '/' 
     });
@@ -172,7 +173,8 @@ export const login = async (req, res) => {
         name: user.name,
         email: user.email,
         avatar: user.avatar,
-        saldo: user.saldo
+        saldo: user.saldo,
+        pin: true
       },
       accessToken,
       refreshToken
@@ -249,7 +251,7 @@ export const refreshToken = async (req, res) => {
     // 3. Ambil data user dari database (lebih aman dan up-to-date)
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },
-      select: { id: true, name: true, email: true, avatar: true, saldo: true } // Pilih field yang ingin Anda kirim ke frontend
+      select: { id: true, name: true, email: true, avatar: true, saldo: true, pin: true } // Pilih field yang ingin Anda kirim ke frontend
     });
 
     if (!user) {
@@ -283,23 +285,39 @@ export const refreshToken = async (req, res) => {
 };
 
 export const editUserNameAndAvatar = async (req, res) => {
+  console.log('Request to edit user profile received', req.body, req.file);
   // Ambil ID pengguna dari parameter URL
   // Misalnya, jika rute Anda adalah /users/:id
   const userId = parseInt(req.params.id); // Pastikan ini dikonversi ke integer
 
   // Ambil field yang mungkin diupdate dari body request
   const { name } = req.body; // Nama baru (opsional)
+  const { currentPin, newPin, confirmNewPin } = req.body; // Pin baru (opsional, jika ingin update pin)
   const avatarFile = req.file; // File avatar baru dari Multer (opsional)
 
+  // const currentPinInt = parseInt(currentPinStr, 10);
+  // const newPinInt = parseInt(newPinStr, 10);
+  // const confirmNewPinInt = parseInt(confirmNewPinStr, 10);
+
+  console.log('Parsed values:', { userId, name, currentPin, newPin, confirmNewPin });
+
+  
   // --- 1. Validasi Input ---
   if (isNaN(userId)) {
     return res.status(400).json({ error: 'Invalid user ID provided. ID must be a number.' });
   }
 
-  // Jika tidak ada nama baru dan tidak ada file avatar baru, tidak ada yang perlu diupdate
-  if (!name && !avatarFile) {
-    return res.status(400).json({ error: 'No data provided for update (name or avatar).' });
+  // validasi pin baru
+  if (newPin && newPin != confirmNewPin) {
+    return res.status(400).json({ error: 'New PIN and confirmation PIN do not match.' });
   }
+
+
+
+  // // Jika tidak ada nama baru dan tidak ada file avatar baru, tidak ada yang perlu diupdate
+  // if (!name && !avatarFile) {
+  //   return res.status(400).json({ error: 'No data provided for update (name or avatar).' });
+  // }
 
   let avatarUrl = null; // Inisialisasi URL avatar baru
 
@@ -308,13 +326,18 @@ export const editUserNameAndAvatar = async (req, res) => {
     // Kita perlu data pengguna saat ini untuk mendapatkan avatar lama jika ada
     const currentUser = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, name: true, email: true, avatar: true, saldo: true } // Pilih field yang relevan
+      select: { id: true, name: true, email: true, avatar: true, saldo: true, pin: true } // Pilih field yang relevan
     });
 
+    
     if (!currentUser) {
       return res.status(404).json({ error: `User with ID ${userId} not found.` });
     }
-
+    //validasi currentPin jika ingin update pin
+    if (currentUser.pin && currentPin && parseInt(currentPin) !== currentUser.pin) {
+      return res.status(400).json({ error: 'Current PIN is incorrect.' });
+    }
+      
     // --- 3. Unggah Avatar Baru (Jika Disediakan) ---
     if (avatarFile) {
       try {
@@ -324,17 +347,15 @@ export const editUserNameAndAvatar = async (req, res) => {
 
         // Opsional: Hapus avatar lama dari GCS
         // Ini adalah praktik baik untuk menghemat ruang dan menghindari file yatim piatu
-        // if (currentUser.avatar) {
-        //   try {
-        //     // Asumsi deleteFileFromGCS mengambil URL atau nama file
-        //     await deleteFileFromGCS(currentUser.avatar);
-        //     console.log('Old avatar deleted from GCS:', currentUser.avatar);
-        //   } catch (deleteError) {
-        //     console.warn('Failed to delete old avatar from GCS:', deleteError);
-        //     // Jangan mengembalikan error ke klien jika penghapusan avatar lama gagal,
-        //     // karena update avatar baru sudah berhasil. Cukup log peringatan.
-        //   }
-        // }
+        if (currentUser.avatar) {
+          try {
+            // Asumsi deleteFileFromGCS mengambil URL atau nama file
+            await deleteFileFromGCS(currentUser.avatar);
+            console.log('Old avatar deleted from GCS:', currentUser.avatar);
+          } catch (deleteError) {
+            console.warn('Failed to delete old avatar from GCS:', deleteError);
+          }
+        }
       } catch (uploadError) {
         console.error('Failed to upload new avatar to GCS:', uploadError);
         return res.status(500).json({ error: 'Failed to upload new avatar image.' });
@@ -345,6 +366,9 @@ export const editUserNameAndAvatar = async (req, res) => {
     const updateData = {};
     if (name) {
       updateData.name = name;
+    }
+    if (newPin) {
+      updateData.pin = parseInt(newPin, 10); // Simpan pin baru yang sudah di-hash
     }
     if (avatarFile) { // Jika ada file baru, gunakan URL yang baru diunggah
       updateData.avatar = avatarUrl;
@@ -361,7 +385,7 @@ export const editUserNameAndAvatar = async (req, res) => {
       }
     }
 
-
+    console.log('Update data prepared:', updateData);
     // --- 5. Perbarui Pengguna di Database ---
     const updatedUser = await prisma.user.update({
       where: {
@@ -373,7 +397,8 @@ export const editUserNameAndAvatar = async (req, res) => {
         name: true,
         email: true,
         avatar: true,
-        saldo: true // Sertakan saldo jika ingin dikembalikan
+        saldo: true, // Sertakan saldo jika ingin dikembalikan
+        pin: true // Sertakan pin jika ingin dikembalikan
       },
     });
 

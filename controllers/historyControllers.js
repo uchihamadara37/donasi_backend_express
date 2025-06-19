@@ -31,6 +31,8 @@ export const getHistory = async (req, res) => {
 };
 
 export const addHistory = async (req, res) => {
+  console.log('Add History Controller called');
+  console.log('Request Body:', req.body);
   const { userId, jumlah, jenis, sumber, transaksiId } = req.body;
 
   if (!userId || !jumlah || !jenis || !sumber) {

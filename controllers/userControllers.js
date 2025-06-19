@@ -20,7 +20,7 @@ export const getAllUser = async (req, res) => {
 export const getUserById = async (req, res) => {
   const { id } = req.params;
   try {
-    const user = await prisma.user.findUnique({ 
+    const user = await prisma.user.findUnique({
       where: { id: parseInt(id) },
       select: {
         id: true,
@@ -40,8 +40,23 @@ export const getUserById = async (req, res) => {
 // Update User
 export const updateUser = async (req, res) => {
   console.log('Update User Controller called');
-  const { id } = req.params; // dapatkan id dari param URL
-  const { name, email, password, saldo } = req.body; // data yang mau diupdate
+  console.log('Request body:', req.body);
+  const id = parseInt(req.params.id); // dapatkan id dari param URL
+  const { name, email, password, saldo, pin, amount } = req.body; // data yang mau diupdate
+
+  const currentUser = await prisma.user.findUnique({
+    where: { id: id },
+    select: { id: true, name: true, email: true, avatar: true, saldo: true, pin: true } // Pilih field yang relevan
+  });
+  if (!currentUser) {
+    return res.status(404).json({ error: `User with ID ${userId} not found.` });
+  }
+
+  if (pin && currentUser.pin !== parseInt(pin)) {
+    console.log('Pin tidak sesuai');
+    return res.status(403).json({ error: 'Pin tidak sesuai' });
+  }
+
 
   try {
     // Jika password ada, hash dulu
@@ -59,6 +74,7 @@ export const updateUser = async (req, res) => {
         ...(email && { email }),
         ...(password && { password: hashedPassword }),
         ...(saldo !== undefined && { saldo }), // saldo bisa 0, jadi jangan gunakan falsy check
+        // ...(pin !== undefined && { pin: parseInt(pin) }), // pin bisa 0, jadi jangan gunakan falsy check
       },
       select: {
         id: true,
@@ -66,19 +82,43 @@ export const updateUser = async (req, res) => {
         email: true,
         avatar: true,
         saldo: true,
+
         // jangan kirim password ke client
       },
     });
+    console.log('User updated:', updatedUser);
+
+
+    const validJenis = ["PEMASUKAN", "PENGELUARAN"];
+    const validSumber = ["TOPUP", "PENARIKAN", "DONASI"];
+    // update history_saldo
+    const newHistory = await prisma.history.create({
+      data: {
+        userId: id,
+        jumlah: amount,
+        jenis: "PENGELUARAN", 
+        sumber: "PENARIKAN",
+        transaksiId: null,
+        waktu: new Date(),
+      },
+      // Pilih field mana yang ingin dikembalikan dalam response
+      select: {
+        id: true,
+        userId: true,
+        jumlah: true,
+        jenis: true,
+        sumber: true,
+        transaksiId: true,
+        waktu: true,
+      },
+    });
+
 
     res.json({ message: 'User updated successfully', user: updatedUser });
   } catch (error) {
+    console.error('Error updating user:', error);
     throw error; // lempar error ke middleware error handling
-    console.error(error);
-    // Jika user dengan id tidak ada, Prisma akan error, tangani di sini:
-    if (error.code === 'P2025') {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    res.status(500).json({ error: 'Internal server error' });
+
   }
 };
 
