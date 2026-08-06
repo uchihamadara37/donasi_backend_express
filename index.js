@@ -1,7 +1,9 @@
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
 import cors from "cors";
 
+import path from 'path';
+import { fileURLToPath } from 'url';
+import morgan from 'morgan';
 
 import userRoutes from './routes/userRoutes.js';
 import authRoutes from './routes/authRoutes.js';
@@ -10,7 +12,6 @@ import historyRoutes from './routes/historyRoutes.js';
 import cookieParser from 'cookie-parser';
 
 const app = express();
-const prisma = new PrismaClient();
 
 const allowedOrigins = [
   'http://localhost:5000',
@@ -32,12 +33,12 @@ const corsOptions = {
   credentials: true,
 };
 
+app.use(morgan('dev'));
+
 app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(express.json());
 
-import path from 'path';
-import { fileURLToPath } from 'url';
 
 // Setup __dirname (karena kamu pakai ES Modules)
 const __filename = fileURLToPath(import.meta.url);

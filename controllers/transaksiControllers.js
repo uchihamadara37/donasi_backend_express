@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import prisma from "../utils/prisma.js";
 
 export const addTransaksi = async (req, res) => {
+  console.log("addTransaksi controller called");
   try {
     const { pengirimId, penerimaId, jumlahDonasi, pesanDonasi } = req.body;
 
@@ -91,6 +91,7 @@ export const addTransaksi = async (req, res) => {
 };
 
 export const getAllTransaksi = async (req, res) => {
+  console.log("get all transactions called mase");
   try {
     const transaksi = await prisma.transaksi.findMany({
       select: {
@@ -102,6 +103,7 @@ export const getAllTransaksi = async (req, res) => {
         waktu: true
       }
     });
+    console.log('All transactions retrieved:', transaksi);
     res.status(200).json(transaksi);
   } catch (error) {
     console.error(error);

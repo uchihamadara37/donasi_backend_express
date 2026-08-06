@@ -1,5 +1,7 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+// import { PrismaClient } from '@prisma/client';
+// const prisma = new PrismaClient();
+
+import prisma from '../utils/prisma.js';
 
 // Get all users
 export const getAllUser = async (req, res) => {
@@ -42,11 +44,18 @@ export const updateUser = async (req, res) => {
   console.log('Update User Controller called');
   console.log('Request body:', req.body);
   const id = parseInt(req.params.id); // dapatkan id dari param URL
-  const { name, email, password, saldo, pin, amount } = req.body; // data yang mau diupdate
+  const { name, email, password, saldo, amount, pin } = req.body; // data yang mau diupdate
 
   const currentUser = await prisma.user.findUnique({
     where: { id: id },
-    select: { id: true, name: true, email: true, avatar: true, saldo: true, pin: true } // Pilih field yang relevan
+    select: { 
+      id: true, 
+      name: true, 
+      email: true, 
+      avatar: true, 
+      saldo: true, 
+      pin: true 
+    } // Pilih field yang relevan
   });
   if (!currentUser) {
     return res.status(404).json({ error: `User with ID ${userId} not found.` });
@@ -89,29 +98,29 @@ export const updateUser = async (req, res) => {
     console.log('User updated:', updatedUser);
 
 
-    const validJenis = ["PEMASUKAN", "PENGELUARAN"];
-    const validSumber = ["TOPUP", "PENARIKAN", "DONASI"];
-    // update history_saldo
-    const newHistory = await prisma.history.create({
-      data: {
-        userId: id,
-        jumlah: amount,
-        jenis: "PENGELUARAN", 
-        sumber: "PENARIKAN",
-        transaksiId: null,
-        waktu: new Date(),
-      },
-      // Pilih field mana yang ingin dikembalikan dalam response
-      select: {
-        id: true,
-        userId: true,
-        jumlah: true,
-        jenis: true,
-        sumber: true,
-        transaksiId: true,
-        waktu: true,
-      },
-    });
+    // const validJenis = ["PEMASUKAN", "PENGELUARAN"];
+    // const validSumber = ["TOPUP", "PENARIKAN", "DONASI"];
+    // // update history_saldo
+    // const newHistory = await prisma.history.create({
+    //   data: {
+    //     userId: id,
+    //     jumlah: amount,
+    //     jenis: "PENGELUARAN", 
+    //     sumber: "PENARIKAN",
+    //     transaksiId: null,
+    //     waktu: new Date(),
+    //   },
+    //   // Pilih field mana yang ingin dikembalikan dalam response
+    //   select: {
+    //     id: true,
+    //     userId: true,
+    //     jumlah: true,
+    //     jenis: true,
+    //     sumber: true,
+    //     transaksiId: true,
+    //     waktu: true,
+    //   },
+    // });
 
 
     res.json({ message: 'User updated successfully', user: updatedUser });

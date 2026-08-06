@@ -1,11 +1,13 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-import { uploadFileToGCS } from '../utils/gcs.js';
+// import { uploadFileToGCS } from '../utils/gcs.js';
 
-import { PrismaClient } from '@prisma/client';
+// import { PrismaClient } from '@prisma/client';
 import path from 'path';
-const prisma = new PrismaClient();
+import prisma from '../utils/prisma.js';
+import { uploadImage } from '../utils/supabseStorage.js';
+// const prisma = new PrismaClient();
 
 // Auth Register
 export const register = async (req, res) => {
@@ -26,7 +28,7 @@ export const register = async (req, res) => {
   if (avatarFile) {
     try {
       // Unggah avatar ke GCS jika file ada
-      avatarUrl = await uploadFileToGCS(avatarFile.buffer, avatarFile.originalname, avatarFile.mimetype);
+      avatarUrl = await uploadImage(avatarFile.buffer, avatarFile.originalname, avatarFile.mimetype);
       console.log('Avatar uploaded to GCS:', avatarUrl);
     } catch (uploadError) {
       console.error('Failed to upload avatar to GCS:', uploadError);

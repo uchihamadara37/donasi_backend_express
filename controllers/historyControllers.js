@@ -1,33 +1,34 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import prisma from "../utils/prisma.js";
 
 export const getHistory = async (req, res) => {
-    try {
-        const { id } = req.params;
+  console.log('Get History Controller called');
+  try {
+    const { id } = req.params;
 
-        const history = await prisma.history.findMany({
-            where: { userId: parseInt(id) },
-            orderBy: { waktu: "desc" },
-            select: {
-                id: true,
-                jumlah: true,
-                jenis: true,
-                sumber: true,
-                transaksiId: true,
-                waktu: true,
-            },
-        });
+    const history = await prisma.history.findMany({
+      where: { userId: parseInt(id) },
+      orderBy: { waktu: "desc" },
+      select: {
+        id: true,
+        jumlah: true,
+        jenis: true,
+        sumber: true,
+        transaksiId: true,
+        waktu: true,
+      },
+    });
 
-        if (!history) {
-            return res.status(404).json({ message: "Belum ada history untuk user", id });
-        }
-
-        res.status(200).json(history);
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: error.message });
+    if (!history) {
+      return res.status(404).json({ message: "Belum ada history untuk user", id });
     }
+
+    console.log('History retrieved:', history);
+    res.status(200).json(history);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
 };
 
 export const addHistory = async (req, res) => {
@@ -91,30 +92,31 @@ export const addHistory = async (req, res) => {
 };
 
 export const getHistoryById = async (req, res) => {
-    const { id } = req.params;
+  const { id } = req.params;
 
-    try {
-        const history = await prisma.history.findUnique({
-            where: { id: parseInt(id) },
-            select: {
-                id: true,
-                jumlah: true,
-                jenis: true,
-                sumber: true,
-                transaksiId: true,
-                waktu: true,
-            },
-        });
+  try {
+    const history = await prisma.history.findUnique({
+      where: { id: parseInt(id) },
+      select: {
+        id: true,
+        jumlah: true,
+        jenis: true,
+        sumber: true,
+        transaksiId: true,
+        waktu: true,
+      },
+    });
 
-        if (!history) {
-            return res.status(404).json({ message: "History tidak ditemukan" });
-        }
-
-        res.status(200).json(history);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: error.message });
+    if (!history) {
+      return res.status(404).json({ message: "History tidak ditemukan" });
     }
+    console.log('History found:', history);
+
+    res.status(200).json(history);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
 };
 
 // // Update history by ID
