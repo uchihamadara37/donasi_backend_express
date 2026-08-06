@@ -16,7 +16,8 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:5000',
   'https://yourdomain.com',
-  'https://donasi-app-dot-c-01-450604.uc.r.appspot.com'
+  'https://donasi-app-dot-c-01-450604.uc.r.appspot.com',
+  'https://donasi-frontend-next.vercel.app'
 ];
 
 const corsOptions = {
